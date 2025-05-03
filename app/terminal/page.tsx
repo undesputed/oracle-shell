@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ChatTerminal } from "@/components/ChatTerminal"
-import { SharedHeader } from "@/components/shared-header"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 export default function TerminalPage() {
@@ -19,8 +18,6 @@ export default function TerminalPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
-      <SharedHeader />
-      {/* Context above the CRT shell, in the bezel area */}
       <div className="w-full max-w-4xl flex flex-col items-center mt-8 mb-4 px-4 mx-auto">
         <h1 className="text-cyan-300 font-[VT323,monospace] text-5xl tracking-widest text-center mb-2 drop-shadow-[0_0_8px_#00fff7]">
           THE ORACLE SHELL
