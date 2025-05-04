@@ -6,6 +6,7 @@ import { useOracleMode } from '@/hooks/use-oracle-mode'
 import { useTerminalTheme } from '@/hooks/use-terminal-theme'
 import { useTruthShard } from '@/hooks/use-truth-shard'
 import { useSearchParams } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 export function ChatTerminal() {
   const [input, setInput] = useState('')
@@ -108,6 +109,15 @@ export function ChatTerminal() {
         title={isAudioPlaying ? "Mute ambient sound" : "Play ambient sound"}
       >
         {isAudioPlaying ? "🔊" : "🔈"}
+      </button>
+
+      {/* Logout button */}
+      <button
+        onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+        className={`absolute top-4 left-4 z-50 p-2 rounded-full ${theme.borderColor} border-2 ${theme.textColor} hover:${theme.backgroundColor} transition-all`}
+        title="Logout"
+      >
+        🚪
       </button>
 
       {/* 90s CRT Monitor Outer Bezel */}
