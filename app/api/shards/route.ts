@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
+import { connectDB } from '@/lib/mongodb'
 import TruthShard from '@/models/TruthShard'
 import { TruthShard as TruthShardType } from '@/types/truth-shard'
 

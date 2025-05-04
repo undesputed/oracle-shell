@@ -18,7 +18,6 @@ export function ChatTerminal() {
   const inputRef = useRef<HTMLInputElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
-  const [isMinting, setIsMinting] = useState(false)
   const searchParams = useSearchParams()
 
   useEffect(() => {
@@ -65,13 +64,10 @@ export function ChatTerminal() {
     // Get the last assistant message as the response
     const lastAssistantMessage = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content
     if (lastAssistantMessage) {
-      setIsMinting(true)
       try {
         await mintShard(message, lastAssistantMessage)
       } catch (error) {
         console.error('Failed to mint Truth Shard:', error)
-      } finally {
-        setIsMinting(false)
       }
     }
   }

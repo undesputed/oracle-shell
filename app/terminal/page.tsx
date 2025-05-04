@@ -1,20 +1,19 @@
 "use client"
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ChatTerminal } from '@/components/ChatTerminal'
 import { Navigation } from '@/components/Navigation'
 import { useTerminalTheme } from '@/hooks/use-terminal-theme'
 import { useOracleMode } from '@/hooks/use-oracle-mode'
 
-export default function TerminalPage() {
+function TerminalContent() {
   const { theme } = useTerminalTheme()
   const { setMode } = useOracleMode()
   const searchParams = useSearchParams()
 
   useEffect(() => {
     // Check for query parameters
-    const prompt = searchParams.get('prompt')
     const mode = searchParams.get('mode') as 'clairvoyant' | 'dissociative' | null
 
     if (mode && (mode === 'clairvoyant' || mode === 'dissociative')) {
@@ -29,5 +28,17 @@ export default function TerminalPage() {
         <ChatTerminal />
       </div>
     </main>
+  )
+}
+
+export default function TerminalPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Loading...
+      </div>
+    }>
+      <TerminalContent />
+    </Suspense>
   )
 }

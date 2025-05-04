@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 interface TruthShard {
   id: string
@@ -23,4 +23,6 @@ const truthShardSchema = new mongoose.Schema<TruthShard>({
 })
 
 // Prevent model overwrite during recompilation
-module.exports = mongoose.models.TruthShard || mongoose.model<TruthShard>('TruthShard', truthShardSchema) 
+const TruthShard = mongoose.models.TruthShard || mongoose.model<TruthShard>('TruthShard', truthShardSchema)
+
+export default TruthShard 
