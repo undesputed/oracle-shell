@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation'
 
 export function ChatTerminal() {
   const [input, setInput] = useState('')
-  const { messages, isLoading, sendMessage } = useChat()
+  const { messageHistory, isLoading, sendMessage } = useChat()
   const { mode, setMode } = useOracleMode()
   const { theme } = useTerminalTheme()
   const { mintShard } = useTruthShard()
@@ -52,7 +52,7 @@ export function ChatTerminal() {
     if (mounted) {
       scrollToBottom()
     }
-  }, [messages, mounted])
+  }, [messageHistory, mounted])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,7 +62,7 @@ export function ChatTerminal() {
     await sendMessage(message, mode)
     
     // Get the last assistant message as the response
-    const lastAssistantMessage = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content
+    const lastAssistantMessage = messageHistory[mode].filter(m => m.role === 'assistant').slice(-1)[0]?.content
     if (lastAssistantMessage) {
       try {
         await mintShard(message, lastAssistantMessage)
@@ -88,9 +88,9 @@ export function ChatTerminal() {
   }
 
   // Helper to get the last assistant message
-  const lastAssistantMessage = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || ''
+  const lastAssistantMessage = messageHistory[mode].filter(m => m.role === 'assistant').slice(-1)[0]?.content || ''
   // Helper to get the last user prompt
-  const lastUserPrompt = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || ''
+  const lastUserPrompt = messageHistory[mode].filter(m => m.role === 'user').slice(-1)[0]?.content || ''
 
   return (
     <div className="relative flex flex-col items-center justify-center">
@@ -201,17 +201,12 @@ export function ChatTerminal() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className={`flex-1 bg-transparent ${theme.textColor} outline-none border-none font-[VT323,monospace] text-xl placeholder-opacity-50`}
-                placeholder={isLoading ? 'Processing...' : 'Enter your query...'}
+                className={`flex-1 bg-transparent border-none outline-none ${theme.textColor} font-mono`}
+                placeholder="Type your message..."
                 disabled={isLoading}
-                autoComplete="off"
               />
             </div>
           </form>
-          {/* Mint label */}
-          <div className={`w-full text-center py-1 ${theme.textColor} font-[VT323,monospace] text-xs tracking-widest border-t ${theme.borderColor} bg-[#181c1b] z-10 relative mt-auto`}>
-            MINT • 0x442e496 •
-          </div>
         </div>
       </div>
 

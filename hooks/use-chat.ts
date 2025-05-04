@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useOracleMode } from './use-oracle-mode'
 import { useTruthShard } from './use-truth-shard'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -24,11 +26,12 @@ export function useChat() {
   const [mounted, setMounted] = useState(false)
   const { mode } = useOracleMode()
   const { mintShard } = useTruthShard()
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
-    // Generate a stable session ID using timestamp and a fixed string
-    const id = `session_${Date.now()}`
+    // Generate a stable session ID using a fixed string and a random number
+    const id = `session_${Math.floor(Math.random() * 1000000)}`
     setSessionId(id)
   }, [])
 
@@ -62,8 +65,20 @@ export function useChat() {
       console.log('Response status:', response.status)
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `Failed to send message: ${response.status}`)
+        let errorMessage = 'Failed to send message'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || `Failed to send message: ${response.status}`
+          
+          // Handle authentication error
+          if (response.status === 401) {
+            router.push('/auth/signin')
+            return
+          }
+        } catch (e) {
+          errorMessage = `Failed to send message: ${response.status}`
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -106,7 +121,7 @@ export function useChat() {
   }
 
   return {
-    messages: messageHistory[mode],
+    messageHistory,
     isLoading,
     sendMessage,
   }

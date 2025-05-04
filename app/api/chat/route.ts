@@ -12,14 +12,20 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return NextResponse.json(
+        { error: 'Please sign in to use the oracle' },
+        { status: 401 }
+      )
     }
 
     const body = await req.json()
     const { messages, mode } = body
 
     if (!messages || !Array.isArray(messages)) {
-      return new NextResponse('Messages are required', { status: 400 })
+      return NextResponse.json(
+        { error: 'Messages are required' },
+        { status: 400 }
+      )
     }
 
     // Connect to MongoDB
@@ -58,6 +64,9 @@ export async function POST(req: Request) {
     return NextResponse.json(response.choices[0].message)
   } catch (error) {
     console.error('Error in chat route:', error)
-    return new NextResponse('Internal Error', { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal Error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
   }
 } 
