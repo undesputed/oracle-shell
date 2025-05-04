@@ -3,21 +3,47 @@
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@/hooks/use-chat'
 import { useOracleMode } from '@/hooks/use-oracle-mode'
+import { useTerminalTheme } from '@/hooks/use-terminal-theme'
+import { useTruthShard } from '@/hooks/use-truth-shard'
+import { useSearchParams } from 'next/navigation'
 
 export function ChatTerminal() {
   const [input, setInput] = useState('')
   const { messages, isLoading, sendMessage } = useChat()
   const { mode, setMode } = useOracleMode()
+  const { theme } = useTerminalTheme()
+  const { mintShard } = useTruthShard()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     setMounted(true)
     if (inputRef.current) {
       inputRef.current.focus()
     }
-  }, [])
+
+    // Check for initial prompt
+    const initialPrompt = searchParams.get('prompt')
+    if (initialPrompt) {
+      setInput(initialPrompt)
+    }
+  }, [searchParams])
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isAudioPlaying) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
+      }
+      setIsAudioPlaying(!isAudioPlaying)
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,13 +61,26 @@ export function ChatTerminal() {
     const message = input.trim()
     setInput('')
     await sendMessage(message, mode)
+    
+    // Get the last assistant message as the response
+    const lastAssistantMessage = messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content
+    if (lastAssistantMessage) {
+      setIsMinting(true)
+      try {
+        await mintShard(message, lastAssistantMessage)
+      } catch (error) {
+        console.error('Failed to mint Truth Shard:', error)
+      } finally {
+        setIsMinting(false)
+      }
+    }
   }
 
   if (!mounted) {
     return (
-      <div className="flex flex-col h-full bg-black text-green-400 font-mono p-4 relative overflow-hidden">
+      <div className={`flex flex-col h-full ${theme.backgroundColor} ${theme.textColor} font-mono p-4 relative overflow-hidden`}>
         <div className="flex-1 overflow-auto space-y-2 mb-4 relative z-10">
-          <div className="text-cyan-400">
+          <div className={theme.accentColor}>
             <span className="mr-2">{'>'}</span>
             <pre className="whitespace-pre-wrap font-mono">
               Initializing terminal...
@@ -59,8 +98,24 @@ export function ChatTerminal() {
 
   return (
     <div className="relative flex flex-col items-center justify-center">
+      {/* Audio player */}
+      <audio
+        ref={audioRef}
+        src="/audio/ambient-synth.mp3"
+        loop
+        className="hidden"
+      />
+      {/* Audio toggle button */}
+      <button
+        onClick={toggleAudio}
+        className={`absolute top-4 right-4 z-50 p-2 rounded-full ${theme.borderColor} border-2 ${theme.textColor} hover:${theme.backgroundColor} transition-all`}
+        title={isAudioPlaying ? "Mute ambient sound" : "Play ambient sound"}
+      >
+        {isAudioPlaying ? "🔊" : "🔈"}
+      </button>
+
       {/* 90s CRT Monitor Outer Bezel */}
-      <div className="crt-monitor relative w-[700px] h-[600px] mx-auto flex flex-col items-center rounded-[2.5rem] shadow-2xl overflow-visible" style={{boxShadow: '0 12px 64px #00ffcc33, 0 0 0 16px #232b23 inset, 0 0 0 36px #181c1b inset'}}>
+      <div className={`crt-monitor relative w-[700px] h-[600px] mx-auto flex flex-col items-center rounded-[2.5rem] ${theme.shadowColor} overflow-visible`} style={{boxShadow: `0 12px 64px ${mode === 'clairvoyant' ? '#00ffcc33' : '#ff00ff33'}, 0 0 0 16px #232b23 inset, 0 0 0 36px #181c1b inset`}}>
         {/* Top highlight/reflection (behind everything) */}
         <div className="absolute top-0 left-0 w-full h-16 rounded-t-[2.5rem] bg-gradient-to-b from-white/10 to-transparent z-10 pointer-events-none" />
         {/* Vents on the left and right */}
@@ -75,7 +130,7 @@ export function ChatTerminal() {
           <div className="w-6 h-1 bg-gray-700 rounded" />
         </div>
         {/* CRT Screen Inset */}
-        <div className="relative flex flex-col flex-1 m-10 mt-2 mb-20 rounded-[2.5rem] overflow-hidden crt-screen border-[20px] border-[#181c1b] w-full h-full" style={{boxShadow: '0 0 120px #00ffcc88, 0 0 0 20px #0f1a1a inset'}}>
+        <div className={`crt-screen w-full h-full rounded-[2rem] ${theme.backgroundColor} ${theme.borderColor} border-4 p-4 relative overflow-hidden flex flex-col`}>
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none z-20">
             <div className="crt absolute inset-0"></div>
@@ -83,16 +138,16 @@ export function ChatTerminal() {
           </div>
           {/* Top label INSIDE the shell */}
           <div className="w-full flex flex-col items-center pt-2 pb-2 bg-transparent z-10 relative">
-            <div className="text-green-400 font-mono text-lg tracking-widest">
+            <div className={`${theme.textColor} font-mono text-lg tracking-widest`}>
               CLAIRVOYANT <span className="mx-2">→</span> DISSOCIATIVE
             </div>
             {/* Mode Switcher */}
             <div className="flex gap-2 mt-2">
               <button
-                className={`px-3 py-1 rounded font-mono text-xs border transition focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                className={`px-3 py-1 rounded font-mono text-xs border transition focus:outline-none focus:ring-2 ${theme.borderColor} ${
                   mode === 'clairvoyant'
-                    ? 'bg-green-700 text-green-200 border-green-400 shadow'
-                    : 'bg-transparent text-green-400 border-green-700 hover:bg-green-900/30'
+                    ? `${theme.backgroundColor} ${theme.textColor} border-${theme.borderColor} shadow`
+                    : 'bg-transparent hover:bg-opacity-30'
                 }`}
                 onClick={() => setMode('clairvoyant')}
                 type="button"
@@ -100,10 +155,10 @@ export function ChatTerminal() {
                 CLAIRVOYANT
               </button>
               <button
-                className={`px-3 py-1 rounded font-mono text-xs border transition focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                className={`px-3 py-1 rounded font-mono text-xs border transition focus:outline-none focus:ring-2 ${theme.borderColor} ${
                   mode === 'dissociative'
-                    ? 'bg-green-700 text-green-200 border-green-400 shadow'
-                    : 'bg-transparent text-green-400 border-green-700 hover:bg-green-900/30'
+                    ? `${theme.backgroundColor} ${theme.textColor} border-${theme.borderColor} shadow`
+                    : 'bg-transparent hover:bg-opacity-30'
                 }`}
                 onClick={() => setMode('dissociative')}
                 type="button"
@@ -113,43 +168,44 @@ export function ChatTerminal() {
             </div>
           </div>
           {/* Scrollable terminal content */}
-          <div className="flex-1 flex flex-col justify-start items-start text-left px-10 pb-2 z-10 relative overflow-y-auto scrollbar-thin scrollbar-thumb-green-900 scrollbar-track-transparent w-full" style={{maxHeight: '320px', minHeight: '320px'}}>
+          <div className="flex-1 overflow-auto space-y-2 mt-4 relative z-10">
             {/* Prompt label and prompt */}
             <div className="mb-2">
-              <span className="text-blue-400 font-bold font-[VT323,monospace] text-lg">{'>> PROMPT:'}</span>
+              <span className={`${theme.accentColor} font-bold font-[VT323,monospace] text-lg`}>{'>> PROMPT:'}</span>
             </div>
             <div className="mb-2">
-              <span className="text-green-400 font-[VT323,monospace] text-lg">{lastUserPrompt || (mode === 'clairvoyant' ? 'what is the meaning of life?' : '...')}</span>
+              <span className={`${theme.textColor} font-[VT323,monospace] text-lg`}>{lastUserPrompt || (mode === 'clairvoyant' ? 'what is the meaning of life?' : '...')}</span>
             </div>
             {/* Separator line */}
-            <div className="w-full border-t border-green-700 mb-4 opacity-60" />
+            <div className={`w-full border-t ${theme.borderColor} mb-4 opacity-60`} />
             {/* Assistant response */}
             <div className="mb-4">
-              <pre className="whitespace-pre-wrap font-[VT323,monospace] text-xl text-green-300 drop-shadow-[0_0_6px_#00ffcc] text-left">
+              <pre className={`whitespace-pre-wrap font-[VT323,monospace] text-xl ${theme.textColor} drop-shadow-[0_0_6px_${mode === 'clairvoyant' ? '#00ffcc' : '#ff00ff'}] text-left`}>
                 {lastAssistantMessage || (mode === 'clairvoyant'
                   ? 'existence is a question\nquestioned by the void itself -'
                   : 'H̸e̸l̴l̸o̵... W̵h̶a̴t̷ ̶d̵o̷ ̷y̵o̵u̵ ̴s̸e̶e̴k̶ ̴i̴n̶ ̵t̷h̵i̸s̶ ̷c̶o̶r̷r̵u̸p̴t̶e̵d̵ ̶s̷p̴a̷c̵e̴?')}
               </pre>
             </div>
             {/* Archiving label */}
-            <div className="mb-2 text-green-400 font-[VT323,monospace] text-base tracking-widest text-left">
+            <div className={`mb-2 ${theme.textColor} font-[VT323,monospace] text-base tracking-widest text-left`}>
               ARCHIVING AS TRUTH SHARD...
             </div>
             {isLoading && (
-              <div className="text-green-400 animate-blink text-left">_</div>
+              <div className={`${theme.textColor} animate-blink text-left`}>_</div>
             )}
             <div ref={messagesEndRef} />
           </div>
-          {/* Input form (re-enabled) */}
-          <form onSubmit={handleSubmit} className="relative z-10 px-10 pb-4 w-full">
+
+          {/* Input form */}
+          <form onSubmit={handleSubmit} className="mt-4 relative z-10">
             <div className="flex items-center">
-              <span className="text-green-400 mr-2">$</span>
+              <span className={`${theme.textColor} mr-2`}>$</span>
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-1 bg-transparent text-green-400 outline-none border-none font-[VT323,monospace] text-xl placeholder-green-700"
+                className={`flex-1 bg-transparent ${theme.textColor} outline-none border-none font-[VT323,monospace] text-xl placeholder-opacity-50`}
                 placeholder={isLoading ? 'Processing...' : 'Enter your query...'}
                 disabled={isLoading}
                 autoComplete="off"
@@ -157,12 +213,13 @@ export function ChatTerminal() {
             </div>
           </form>
           {/* Mint label */}
-          <div className="w-full text-center py-1 text-green-400 font-[VT323,monospace] text-xs tracking-widest border-t border-green-900 bg-[#181c1b] z-10 relative">
+          <div className={`w-full text-center py-1 ${theme.textColor} font-[VT323,monospace] text-xs tracking-widest border-t ${theme.borderColor} bg-[#181c1b] z-10 relative mt-auto`}>
             MINT • 0x442e496 •
           </div>
         </div>
       </div>
-      <style jsx global>{`
+
+      <style jsx>{`
         @keyframes glitch {
           0% { transform: translate(0) }
           20% { transform: translate(-2px, 2px) }
@@ -206,8 +263,8 @@ export function ChatTerminal() {
           border: 16px solid #232b23;
         }
         .crt-screen {
-          background: radial-gradient(ellipse at 50% 40%, #1a2a1a 80%, #181c1b 100%);
-          box-shadow: 0 0 64px #00ffcc44, 0 0 0 8px #0f1a1a inset;
+          background: radial-gradient(ellipse at 50% 40%, ${mode === 'clairvoyant' ? '#1a2a1a' : '#1a001a'} 80%, #181c1b 100%);
+          box-shadow: 0 0 64px ${mode === 'clairvoyant' ? '#00ffcc44' : '#ff00ff44'}, 0 0 0 8px #0f1a1a inset;
         }
         /* Custom scrollbar for terminal content */
         .scrollbar-thin {

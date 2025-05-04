@@ -4,11 +4,14 @@ import type React from "react"
 
 import { OracleModeProvider } from "@/hooks/use-oracle-mode"
 import { TruthShardsProvider } from "@/hooks/use-truth-shards"
+import { TerminalThemeProvider } from "@/hooks/use-terminal-theme"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <OracleModeProvider>
-      <TruthShardsProvider>{children}</TruthShardsProvider>
+      <TerminalThemeProvider>
+        <TruthShardsProvider>{children}</TruthShardsProvider>
+      </TerminalThemeProvider>
     </OracleModeProvider>
   )
 }
