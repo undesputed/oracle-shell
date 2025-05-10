@@ -3,6 +3,7 @@
 import { Navigation } from '@/components/Navigation'
 import { TruthShardWall } from '@/components/TruthShardWall'
 import { useTerminalTheme } from '@/hooks/use-terminal-theme'
+import { GlitchText } from '@/components/glitch-text'
 
 export default function ShardsPage() {
   const { theme } = useTerminalTheme()
@@ -16,10 +17,10 @@ export default function ShardsPage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
-            <h1 className={`${theme.textColor} font-[VT323,monospace] text-5xl sm:text-6xl tracking-widest mb-6`}>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-6 font-sans">
               TRUTH SHARD ARCHIVE
             </h1>
-            <p className={`${theme.textColor} font-mono text-lg sm:text-xl text-center max-w-3xl mx-auto leading-relaxed`}>
+            <p className="text-gray-600 dark:text-gray-300 font-sans text-lg sm:text-xl text-center max-w-3xl mx-auto leading-relaxed">
               A collection of all interactions with the Oracle. Each shard represents a moment of cosmic insight or digital chaos.
             </p>
           </div>

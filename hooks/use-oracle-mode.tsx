@@ -24,7 +24,7 @@ export function OracleModeProvider({ children }: { children: React.ReactNode }) 
 export function useOracleMode() {
   const context = useContext(OracleModeContext)
   if (context === undefined) {
-    throw new Error('useOracleMode must be used within an OracleModeProvider')
+    throw new Error("useOracleMode must be used within an OracleModeProvider")
   }
   return context
 }

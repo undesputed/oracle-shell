@@ -1,31 +1,25 @@
-"use client"
-
-import type { ReactNode } from "react"
+import type React from "react"
+import type { ButtonHTMLAttributes } from "react"
 import { cn } from "@/lib/utils"
 
-interface NeonButtonProps {
-  children: ReactNode
-  onClick?: () => void
+interface NeonButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode
   className?: string
 }
 
-export function NeonButton({ children, onClick, className }: NeonButtonProps) {
+// Export as default instead of named export
+export default function NeonButton({ children, className, ...props }: NeonButtonProps) {
   return (
     <button
-      onClick={onClick}
       className={cn(
-        "group relative overflow-hidden rounded-md border-2 border-cyan-500 bg-transparent px-8 py-4 font-bold text-cyan-400 transition-all duration-300",
-        "hover:bg-cyan-900/20 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.5)]",
-        "active:translate-y-1",
+        "relative overflow-hidden rounded-md border-2 px-6 py-3 font-mono text-sm font-medium transition-all duration-300",
+        "after:absolute after:inset-0 after:z-[-1] after:opacity-0 after:transition-opacity after:duration-300 hover:after:opacity-100",
+        "focus:outline-none focus:ring-2 focus:ring-offset-2",
         className,
       )}
+      {...props}
     >
-      <span className="relative z-10">{children}</span>
-      <span className="absolute inset-0 z-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/30 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-      <span
-        className="absolute -inset-1 -z-10 animate-pulse opacity-0 blur transition-opacity duration-300 group-hover:opacity-100"
-        style={{ background: "linear-gradient(90deg, #00ffff, #ff00ff)" }}
-      ></span>
+      {children}
     </button>
   )
 }

@@ -1,42 +1,55 @@
 "use client"
 
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import type React from "react"
+
 import { useState } from "react"
 import Link from "next/link"
-import { useTerminalTheme } from "@/hooks/use-terminal-theme"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Lock, User, ArrowRight } from 'lucide-react'
+import { AlertCircle, Mail, Lock, User, ArrowRight } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 
-export default function SignIn() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+export default function SignUp() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const { theme } = useTerminalTheme()
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    try {
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-      })
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      setIsLoading(false)
+      return
+    }
 
-      if (result?.error) {
-        setError("Invalid credentials")
-      } else {
-        router.push("/")
-      }
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      // Redirect to success page or login
+      router.push("/auth/signin?registered=true")
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message)
@@ -53,14 +66,14 @@ export default function SignIn() {
       {/* Logo/Brand Header */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-primary-700 mb-2">Oracle Shell</h1>
-        <p className="text-gray-600">Access your intelligent assistant</p>
+        <p className="text-gray-600">Create your account</p>
       </div>
 
       <Card className="max-w-md w-full border-primary-100 shadow-lg">
         <CardHeader className="space-y-1 bg-gradient-to-r from-primary-50 to-white border-b border-primary-100">
-          <CardTitle className="text-2xl font-bold text-center text-primary-900">Sign In</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-primary-900">Sign Up</CardTitle>
           <CardDescription className="text-center text-gray-600">
-            Enter your credentials to access your account
+            Create an account to access Oracle Shell
           </CardDescription>
         </CardHeader>
 
@@ -83,39 +96,95 @@ export default function SignIn() {
                 </div>
                 <Input
                   id="username"
+                  name="username"
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={formData.username}
+                  onChange={handleChange}
                   className="pl-10 border-primary-200 focus:border-primary-400 focus:ring-primary-400"
-                  placeholder="Enter your username"
+                  placeholder="Choose a username"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-700">
-                  Password
-                </Label>
-                <Link href="/auth/forgot-password" className="text-sm text-primary-600 hover:text-primary-800">
-                  Forgot password?
-                </Link>
+              <Label htmlFor="email" className="text-gray-700">
+                Email
+              </Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="pl-10 border-primary-200 focus:border-primary-400 focus:ring-primary-400"
+                  placeholder="Enter your email"
+                  required
+                />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700">
+                Password
+              </Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                   <Lock className="h-5 w-5" />
                 </div>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
                   className="pl-10 border-primary-200 focus:border-primary-400 focus:ring-primary-400"
-                  placeholder="Enter your password"
+                  placeholder="Create a password"
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-gray-700">
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="pl-10 border-primary-200 focus:border-primary-400 focus:ring-primary-400"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox id="terms" required />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700"
+              >
+                I agree to the{" "}
+                <Link href="/terms" className="text-primary-600 hover:text-primary-800">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="text-primary-600 hover:text-primary-800">
+                  Privacy Policy
+                </Link>
+              </label>
             </div>
 
             <Button
@@ -126,11 +195,11 @@ export default function SignIn() {
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                  Signing in...
+                  Creating account...
                 </span>
               ) : (
                 <span className="flex items-center justify-center">
-                  Sign In <ArrowRight className="ml-2 h-4 w-4" />
+                  Create Account <ArrowRight className="ml-2 h-4 w-4" />
                 </span>
               )}
             </Button>
@@ -139,28 +208,10 @@ export default function SignIn() {
 
         <CardFooter className="flex flex-col space-y-4 bg-gradient-to-r from-white to-primary-50 border-t border-primary-100 p-6">
           <div className="text-center text-gray-600 text-sm">
-            Don't have an account?{" "}
-            <Link href="/auth/signup" className="text-primary-600 hover:text-primary-800 font-medium">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/auth/signin" className="text-primary-600 hover:text-primary-800 font-medium">
+              Sign in
             </Link>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="flex space-x-3">
-            <Button variant="outline" className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50">
-              Google
-            </Button>
-            <Button variant="outline" className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50">
-              GitHub
-            </Button>
           </div>
         </CardFooter>
       </Card>
@@ -189,4 +240,3 @@ export default function SignIn() {
     </div>
   )
 }
-

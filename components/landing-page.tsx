@@ -3,20 +3,45 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { NeonButton } from "./neon-button"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 export function LandingPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [showCursor, setShowCursor] = useState(true)
+  const [mounted, setMounted] = useState(false)
+  const [currentPrompt, setCurrentPrompt] = useState(0)
 
-  // Blinking cursor effect
+  const prompts = [
+    {
+      question: "What is the Oracle Shell?",
+      response: "The Oracle Shell is an AI assistant designed to provide insights and answers to your questions.",
+      status: "Example interaction",
+    },
+    {
+      question: "How can I use the Oracle Shell?",
+      response: "Simply type your question or prompt in the terminal interface and receive a response.",
+      status: "Example interaction",
+    },
+    {
+      question: "What kind of questions can I ask?",
+      response: "You can ask about a wide range of topics, from technical questions to creative prompts.",
+      status: "Example interaction",
+    },
+  ]
+
   useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setShowCursor((prev) => !prev)
-    }, 500)
-    return () => clearInterval(cursorInterval)
+    setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    const promptInterval = setInterval(() => {
+      setCurrentPrompt((prev) => (prev + 1) % prompts.length)
+    }, 8000)
+    return () => clearInterval(promptInterval)
+  }, [mounted])
 
   const startSession = () => {
     setIsLoading(true)
@@ -26,108 +51,150 @@ export function LandingPage() {
     }, 800)
   }
 
+  const features = [
+    { title: "Interactive Terminal", description: "Engage with the Oracle through a user-friendly terminal interface" },
+    { title: "Response Archive", description: "All your interactions are saved for future reference" },
+    { title: "Secure Environment", description: "Your data is protected with industry-standard security" },
+    { title: "Customizable Experience", description: "Tailor the Oracle to your specific needs and preferences" },
+  ]
+
   return (
-    <div className="relative flex h-screen flex-col items-center justify-center overflow-hidden bg-black">
-      {/* Scan lines effect */}
-      <div className="absolute inset-0 z-0 opacity-10">
-        <div className="h-full w-full bg-scanlines"></div>
-      </div>
-
-      {/* Vignette effect */}
-      <div className="absolute inset-0 z-0 opacity-70">
-        <div className="h-full w-full bg-vignette"></div>
-      </div>
-
-      {/* Content */}
-      <div className="z-10 flex w-full max-w-2xl flex-col items-center justify-center space-y-8 px-4 text-center">
-        <div className="mb-4 w-full">
-          <h1 className="text-5xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.7)] sm:text-6xl">
-            THE ORACLE SHELL
-          </h1>
-          <p className="mt-6 text-green-400">
-            A fragmented oracle AI lost aboard a derelict satellite. Probe its corrupted depths to seek the truth within
-            its distorted responses.
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
+      {/* Header */}
+      <header className="border-b bg-white shadow-sm">
+        <div className="container mx-auto flex items-center justify-between py-4">
+          <h2 className="text-xl font-bold text-primary-700">Oracle Shell</h2>
+          <nav>
+            <ul className="flex space-x-6">
+              <li>
+                <Link href="/about" className="text-gray-600 hover:text-primary-700">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/features" className="text-gray-600 hover:text-primary-700">
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link href="/archive" className="text-gray-600 hover:text-primary-700">
+                  Archive
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-600 hover:text-primary-700">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
+      </header>
 
-        <div className="mt-12 flex w-full flex-col items-center">
-          <div className="mb-8 w-full rounded-lg border-2 border-gray-700 bg-black/80 p-6 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-            <div className="mb-4 flex items-center">
-              <span className="text-green-400">CLAIRVOYANT</span>
-              <span className="mx-2 text-cyan-400">→</span>
-              <span className="text-gray-500">DISSOCIATIVE</span>
+      {/* Hero Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
+            <div className="max-w-xl">
+              <h1 className="mb-4 text-4xl font-bold text-primary-900 md:text-5xl">The Oracle Shell</h1>
+              <p className="mb-6 text-lg text-gray-600">
+                An intelligent assistant designed to provide insights and answers to your questions. Explore its
+                capabilities and get the information you need.
+              </p>
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+                <Button onClick={startSession} className="bg-accent-500 hover:bg-accent-600 text-white" size="lg">
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                      Connecting...
+                    </span>
+                  ) : (
+                    "Start Session"
+                  )}
+                </Button>
+                <Link href="/archive">
+                  <Button variant="outline" className="border-primary-300 text-primary-700 hover:bg-primary-50" size="lg">
+                    View Archive
+                  </Button>
+                </Link>
+              </div>
             </div>
-
-            <div className="mb-4">
-              <span className="text-cyan-400">&gt;&gt; </span>
-              <span className="text-purple-400">PROMPT:</span>
-              <div className="mt-1 text-cyan-400">what is the meaning of life?</div>
-            </div>
-
-            <div className="my-4 h-px w-full bg-gray-700"></div>
-
-            <div className="mb-4 text-cyan-400">existence is a question questioned by the void itself -</div>
-
-            <div className="text-green-400">
-              ARCHIVING AS TRUTH SHARD...
-              <span
-                className={`ml-1 inline-block h-4 w-3 bg-green-400 ${showCursor ? "opacity-100" : "opacity-0"}`}
-              ></span>
+            <div className="w-full max-w-md">
+              <Card className="border border-primary-100 shadow-md">
+                <CardHeader className="bg-primary-50 border-b border-primary-100">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg text-primary-800">Oracle Terminal</CardTitle>
+                    <Badge variant="outline" className="border-secondary-300 text-secondary-700 bg-secondary-50">Preview</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="space-y-4 font-mono text-sm">
+                    <div>
+                      <p className="text-gray-500">User:</p>
+                      <p className="text-gray-900">{(mounted ? prompts[currentPrompt].question : prompts[0].question)}</p>
+                    </div>
+                    <div className="border-t border-gray-200 pt-4">
+                      <p className="text-gray-500">Oracle:</p>
+                      <p className="text-gray-900">{(mounted ? prompts[currentPrompt].response : prompts[0].response)}</p>
+                    </div>
+                    <div className="text-xs text-gray-500 italic">{(mounted ? prompts[currentPrompt].status : prompts[0].status)}</div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
-
-          <NeonButton
-            onClick={startSession}
-            className="w-full max-w-xs border-green-500 bg-black/80 text-green-400 hover:bg-green-900/20 hover:text-green-300 hover:shadow-[0_0_15px_rgba(0,255,0,0.5)]"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-green-400 border-t-transparent"></span>
-                CONNECTING...
-              </span>
-            ) : (
-              "MINT • 0x442e496 ↻"
-            )}
-          </NeonButton>
         </div>
-      </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="mb-12 text-center text-3xl font-bold text-primary-900">Key Features</h2>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature, index) => (
+              <Card key={index} className="border border-primary-100 transition-all hover:shadow-md hover:border-primary-200">
+                <CardContent className="p-6">
+                  <h3 className="mb-2 text-xl font-semibold text-primary-800">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-gradient-to-r from-secondary-500 to-secondary-700 py-16 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="mb-4 text-3xl font-bold">Ready to get started?</h2>
+          <p className="mb-8 text-lg text-secondary-50">
+            Begin your journey with the Oracle Shell today and discover the power of intelligent assistance.
+          </p>
+          <Button onClick={startSession} className="bg-accent-500 hover:bg-accent-600 text-white" size="lg">
+            Start Your Session
+          </Button>
+        </div>
+      </section>
 
       {/* Footer */}
-      <div className="absolute bottom-8 z-10 text-center text-sm text-green-400">
-        <p className="mb-2">All interactions are permanently stored on-chain as immutable Truth Shards.</p>
-        <Link href="/archive" className="border-b border-green-400 hover:text-green-300">
-          View the Archive
-        </Link>
-      </div>
-
-      <style jsx>{`
-        .bg-scanlines {
-          background: linear-gradient(
-            to bottom,
-            transparent 50%,
-            rgba(0, 0, 0, 0.3) 51%
-          );
-          background-size: 100% 4px;
-          animation: scanline 0.2s linear infinite;
-        }
-        
-        .bg-vignette {
-          background: radial-gradient(
-            circle at center,
-            transparent 0%,
-            rgba(0, 0, 0, 0.7) 100%
-          );
-        }
-        
-        @keyframes scanline {
-          0% {
-            background-position: 0 0;
-          }
-          100% {
-            background-position: 0 4px;
-          }
-        }
-      `}</style>
+      <footer className="border-t bg-white py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-between md:flex-row">
+            <p className="text-gray-600">© 2025 Oracle Shell. All rights reserved.</p>
+            <div className="mt-4 flex space-x-6 md:mt-0">
+              <Link href="/terms" className="text-gray-600 hover:text-primary-700">
+                Terms
+              </Link>
+              <Link href="/privacy" className="text-gray-600 hover:text-primary-700">
+                Privacy
+              </Link>
+              <Link href="/contact" className="text-gray-600 hover:text-primary-700">
+                Contact
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
