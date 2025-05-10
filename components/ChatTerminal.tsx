@@ -5,7 +5,6 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useChat } from "@/hooks/use-chat"
 import { useOracleMode } from "@/hooks/use-oracle-mode"
-import { useTerminalTheme } from "@/components/terminal-theme-provider"
 import { useTruthShard } from "@/hooks/use-truth-shard"
 import { useSearchParams } from "next/navigation"
 import { signOut } from "next-auth/react"
@@ -16,7 +15,6 @@ export function ChatTerminal() {
   const [input, setInput] = useState("")
   const { messageHistory, isLoading, sendMessage } = useChat()
   const { mode, setMode } = useOracleMode()
-  const { theme } = useTerminalTheme()
   const { mintShard } = useTruthShard()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)

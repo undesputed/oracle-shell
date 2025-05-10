@@ -108,7 +108,7 @@ export default function FAQPage() {
           <div className="rounded-lg bg-gray-50 p-8 text-center">
             <h2 className="mb-4 text-2xl font-semibold text-gray-900">Still have questions?</h2>
             <p className="mb-6 text-gray-600">
-              If you couldn't find the answer you were looking for, our support team is here to help.
+              If you couldn&apos;t find the answer you were looking for, our support team is here to help.
             </p>
             <div className="flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <Button className="bg-blue-600 hover:bg-blue-700">Contact Support</Button>

@@ -4,7 +4,6 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { useTerminalTheme } from "@/hooks/use-terminal-theme"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +17,6 @@ export default function SignIn() {
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const { theme } = useTerminalTheme()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -139,7 +137,7 @@ export default function SignIn() {
 
         <CardFooter className="flex flex-col space-y-4 bg-gradient-to-r from-white to-primary-50 border-t border-primary-100 p-6">
           <div className="text-center text-gray-600 text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="text-primary-600 hover:text-primary-800 font-medium">
               Sign up
             </Link>

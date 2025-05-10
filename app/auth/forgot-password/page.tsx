@@ -70,10 +70,10 @@ export default function ForgotPassword() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Check your email</h3>
               <p className="text-gray-600 mb-4">
-                We've sent a password reset link to <span className="font-medium">{email}</span>
+                We&apos;ve sent a password reset link to <span className="font-medium">{email}</span>
               </p>
               <p className="text-sm text-gray-500">
-                Didn't receive the email? Check your spam folder or{" "}
+                Didn&apos;t receive the email? Check your spam folder or{" "}
                 <button
                   onClick={() => setIsSubmitted(false)}
                   className="text-primary-600 hover:text-primary-800 font-medium"

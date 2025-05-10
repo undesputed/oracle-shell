@@ -3,7 +3,6 @@
 import { Navigation } from '@/components/Navigation'
 import { TruthShardWall } from '@/components/TruthShardWall'
 import { useTerminalTheme } from '@/hooks/use-terminal-theme'
-import { GlitchText } from '@/components/glitch-text'
 
 export default function ShardsPage() {
   const { theme } = useTerminalTheme()

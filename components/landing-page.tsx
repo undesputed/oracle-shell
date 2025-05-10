@@ -41,7 +41,7 @@ export function LandingPage() {
       setCurrentPrompt((prev) => (prev + 1) % prompts.length)
     }, 8000)
     return () => clearInterval(promptInterval)
-  }, [mounted])
+  }, [mounted, prompts.length])
 
   const startSession = () => {
     setIsLoading(true)

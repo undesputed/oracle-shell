@@ -71,7 +71,7 @@ export default function AboutPage() {
             <p>
               Oracle Shell was developed by a team of AI researchers, engineers, and designers passionate about creating
               useful AI tools. Our team combines expertise in machine learning, natural language processing, and user
-              experience design to create an assistant that's both powerful and easy to use.
+              experience design to create an assistant that&apos;s both powerful and easy to use.
             </p>
 
             <h2 className="mt-8 text-2xl font-semibold text-primary-800">Privacy & Security</h2>
@@ -84,7 +84,7 @@ export default function AboutPage() {
             <div className="mt-12 rounded-lg bg-gradient-to-r from-secondary-50 to-secondary-100 p-8 border border-secondary-200">
               <h3 className="mb-4 text-xl font-semibold text-secondary-800">Start Your Journey with Oracle Shell</h3>
               <p className="mb-6 text-secondary-700">
-                Whether you're looking for information, need help with a task, or just want to explore the capabilities
+                Whether you&apos;re looking for information, need help with a task, or just want to explore the capabilities
                 of AI, Oracle Shell is here to assist you.
               </p>
               <Link href="/">
